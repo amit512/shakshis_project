@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Job Portal - CareersNepal
 
 A full-stack job portal application built with React and Node.js, connecting job seekers with employers in Nepal.
@@ -268,3 +269,6 @@ This project is licensed under the ISC License.
 
 **Note**: Make sure to set up your environment variables before running the application. The application requires a MongoDB database connection and Cloudinary account for image uploads.
 
+=======
+# shakshis_project
+>>>>>>> 917a724056f542e23277d08d4e6beb8146acad25
