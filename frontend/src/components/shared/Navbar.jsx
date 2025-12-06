@@ -47,9 +47,11 @@ const Navbar = () => {
     <div className="bg-white shadow">
       <div className="flex items-center justify-between mx-auto max-w-7xl h-16 px-4">
         {/* Logo */}
-        <h1 className=" ml-20 text-2xl font-bold text-[#008E97]">
-          Careers<span className="text-[#0b2527]">Nepal</span>
-        </h1>
+        <Link to="/">
+          <h1 className=" ml-20 text-2xl font-bold text-[#008E97] cursor-pointer hover:opacity-80 transition-opacity">
+            Careers<span className="text-[#0b2527]">Nepal</span>
+          </h1>
+        </Link>
 
         {/* Right Section: Nav + Profile */}
         <div className="flex items-center gap-3">

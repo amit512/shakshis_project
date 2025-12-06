@@ -6,7 +6,8 @@ import axios from 'axios';
 import { APPLICATION_API_END_POINT, JOB_API_END_POINT } from '@/utils/constant';
 import { setSingleJob } from '@/redux/jobSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'sonner'; 
+import { toast } from 'sonner';
+import Navbar from './shared/Navbar'; 
 
 const JobDescription = () => {
   const { singleJob } = useSelector((store) => store.job);
@@ -108,14 +109,19 @@ useEffect(() => {
 
   if (!singleJob || Object.keys(singleJob).length === 0) {
     return (
-      <div className="text-center my-10">
-        <p className="text-xl">Loading job details...</p>
+      <div>
+        <Navbar />
+        <div className="text-center my-10">
+          <p className="text-xl">Loading job details...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto my-12 px-4">
+    <div>
+      <Navbar />
+      <div className="max-w-5xl mx-auto my-12 px-4">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">{singleJob?.title ?? 'No title found'}</h1>
@@ -184,6 +190,7 @@ useEffect(() => {
           </p>
         </div>
       </div>
+    </div>
     </div>
   );
 };

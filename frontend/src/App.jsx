@@ -12,7 +12,9 @@ import CompanySetup from './components/admin/CompanySetup';
 import { Toaster } from 'react-hot-toast';
 import AdminJobs from './components/admin/AdminJobs';
 import PostJob from './components/admin/PostJob';
+import EditJob from './components/admin/EditJob';
 import Applicants from './components/admin/Applicants';
+import useActivityTracker from './hooks/useActivityTracker';
 
 const appRouter = createBrowserRouter([
   {
@@ -62,18 +64,31 @@ const appRouter = createBrowserRouter([
     path:"/admin/jobs/create",
     element: <PostJob/>
   },{
+    path:"/admin/jobs/edit/:id",
+    element: <EditJob/>
+  },{
     path:"/admin/jobs/:id/applicants",
     element: <Applicants/>
   }
 ])
 
-export default function App() {
+// Component to wrap RouterProvider and include activity tracking
+const AppContent = () => {
+  // Track user activity to prevent auto-logout
+  useActivityTracker();
+  
+  return <RouterProvider router={appRouter} />;
+};
+
+function App() {
   return (
     <>
-    <RouterProvider router = {appRouter}/>
+    <AppContent />
     <Toaster position="top-right" reverseOrder={false} />
     </>
   );
 }
+
+export default App;
 
   

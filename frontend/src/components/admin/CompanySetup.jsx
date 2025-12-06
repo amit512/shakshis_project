@@ -8,8 +8,9 @@ import { COMPANY_API_END_POINT } from '@/utils/constant'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import useGetCompanyById from '@/hooks/useGetCompanyById'
+import { setCompanies } from '@/redux/companySlice'
 
 const CompanySetup = () => {
   const params = useParams();
@@ -25,6 +26,7 @@ const CompanySetup = () => {
   const {singleCompany} = useSelector(store => store.company);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value })
@@ -37,15 +39,22 @@ const CompanySetup = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    
+    if (!input.name.trim()) {
+      toast.error('Company name is required');
+      return;
+    }
+
     const formData = new FormData();
-    formData.append("name", input.name);
-    formData.append("description", input.description);
-    formData.append("website", input.website);
-    formData.append("location", input.location);
+    formData.append("name", input.name.trim());
+    formData.append("description", input.description || "");
+    formData.append("website", input.website || "");
+    formData.append("location", input.location || "");
 
     if (input.file) {
       formData.append("file", input.file);
     }
+    
     try {
       setLoading(true);
       const res = await axios.put(`${COMPANY_API_END_POINT}/update/${params.id}`, formData, {
@@ -55,14 +64,31 @@ const CompanySetup = () => {
         withCredentials: true,
         timeout: 10000
       });
+      
       if (res.data.success) {
-        toast.success(res.data.message);
-        navigate("/admin/companies")
+        // Fetch updated companies list to show the updated company
+        try {
+          const companiesRes = await axios.get(`${COMPANY_API_END_POINT}/get`, {
+            withCredentials: true
+          });
+          if(companiesRes.data.success) {
+            dispatch(setCompanies(companiesRes.data.companies));
+          }
+        } catch (fetchError) {
+          console.log('Error fetching companies:', fetchError);
+        }
+        
+        toast.success(res.data.message || 'Company updated successfully!');
+        
+        // Navigate after a short delay to ensure toast is visible
+        setTimeout(() => {
+          navigate("/admin/companies");
+        }, 500);
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message);
-      error.response?.data?.message || error.message || "Something went wrong"
+      const errorMessage = error.response?.data?.message || error.message || "Something went wrong";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

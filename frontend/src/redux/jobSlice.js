@@ -6,11 +6,17 @@ export const fetchAllJobs = createAsyncThunk(
   "job/fetchAllJobs",
   async (_, thunkAPI) => {
     try {
-      const token = localStorage.getItem("token"); // or get it from Redux
+      const token = localStorage.getItem("token");
+      const headers = {};
+      
+      // Only add Authorization header if token exists
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+      
       const response = await axios.get("http://localhost:8000/api/jobs/get", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers,
+        withCredentials: true
       });
       return response.data;
     } catch (error) {
@@ -27,6 +33,11 @@ const initialState = {
   searchJobByText: "",
   searchedQuery: "",
   allAppliedJobs: [],
+  filters: {
+    location: "",
+    industry: "",
+    salary: ""
+  },
   loading: false,
   error: null
 };
@@ -53,6 +64,16 @@ const jobSlice = createSlice({
     },
     setSearchedQuery: (state, action) => {
       state.searchedQuery = action.payload;
+    },
+    setFilters: (state, action) => {
+      state.filters = { ...state.filters, ...action.payload };
+    },
+    clearFilters: (state) => {
+      state.filters = {
+        location: "",
+        industry: "",
+        salary: ""
+      };
     }
   },
   extraReducers: (builder) => {
@@ -63,7 +84,10 @@ const jobSlice = createSlice({
       })
       .addCase(fetchAllJobs.fulfilled, (state, action) => {
         state.loading = false;
-        state.allJobs = action.payload;
+        // Handle both array and object response formats
+        state.allJobs = Array.isArray(action.payload) 
+          ? action.payload 
+          : (action.payload?.jobs || []);
       })
       .addCase(fetchAllJobs.rejected, (state, action) => {
         state.loading = false;
@@ -79,7 +103,9 @@ export const {
   setAllAdminJobs,
   setSearchJobByText,
   setAllAppliedJobs,
-  setSearchedQuery
+  setSearchedQuery,
+  setFilters,
+  clearFilters
 } = jobSlice.actions;
 
 export default jobSlice.reducer;

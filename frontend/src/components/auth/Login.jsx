@@ -4,7 +4,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { RadioGroup } from '../ui/radio-group';
 import { Button } from '../ui/button';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { USER_API_END_POINT } from '@/utils/constant';
 import { toast } from 'sonner';
 import axios from 'axios';
@@ -25,6 +25,8 @@ const Login = () => {
   const { loading } = useSelector(store => store.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const redirectPath = searchParams.get('redirect');
 
  useEffect(() => {
   dispatch(setLoading(false));
@@ -53,6 +55,7 @@ const Login = () => {
 
   // 🧼 Ensure consistent structure for Redux
   const cleanedUser = {
+    _id: userData._id,
     fullname: userData.fullname,
     role: userData.role,
     profile: {
@@ -66,7 +69,13 @@ console.log("User in Redux right after login:", store.getState().auth.user);
 
   localStorage.setItem('user', JSON.stringify(cleanedUser));
   toast.success(res.data.message);
-  navigate('/');
+  
+  // Redirect to the path specified in query params, or home if none
+  if (redirectPath) {
+    navigate(redirectPath);
+  } else {
+    navigate('/');
+  }
 }
 
 

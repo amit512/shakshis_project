@@ -1,9 +1,29 @@
 import React from 'react'
 import { Badge } from './ui/badge'
+import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const LatestJobCards = ({ job }) => {
+  const navigate = useNavigate()
+  const { user } = useSelector(store => store.auth)
+  const isAuthenticated = user !== null
+
+  const handleCardClick = () => {
+    const jobId = job._id || job.id
+    if (!jobId) return
+
+    if (isAuthenticated) {
+      // User is logged in, navigate directly to job description
+      navigate(`/description/${jobId}`)
+    } else {
+      // User is not logged in, redirect to login with return path
+      navigate(`/login?redirect=/description/${jobId}`)
+    }
+  }
+
   return (
     <div
+      onClick={handleCardClick}
       className='p-6 rounded-2xl bg-white border border-gray-100 transition-all duration-300 ease-in-out cursor-pointer hover:scale-[1.01]'
       style={{
         boxShadow: `
